@@ -1,0 +1,14 @@
+# Compound interest calculator
+
+$principal := 1000
+$rate := 0.05
+$years := 10
+
+# Validate inputs
+$isValid := $principal > 0 && $rate > 0 && $years > 0
+
+# Calculate result
+$multiplier := (1 + $rate) ^ $years
+$result := ROUND($principal * $multiplier, 2)
+
+IF($isValid, "Final amount: " + TEXT($result), ERROR("Invalid input"))

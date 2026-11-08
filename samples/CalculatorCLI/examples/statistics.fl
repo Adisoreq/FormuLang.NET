@@ -1,0 +1,7 @@
+# Mean and standard deviation of a data set
+
+$data = [2, 4, 4, 4, 5, 5, 7, 9]
+$mean = AVG($data)
+$stdev = SQRT(SUM(MAP($data, (x) => (x - $mean) ^ 2)) / LEN($data))
+
+{ mean: $mean, stdev: $stdev, above_mean: FILTER($data, (x) => x > $mean) }

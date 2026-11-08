@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FormuLang.NET.Abstractions\FormuLang.NET.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\FormuLang.NET.Core\FormuLang.NET.Core.csproj" />
+  </ItemGroup>
+
+</Project>

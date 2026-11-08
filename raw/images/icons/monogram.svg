@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="128"
+   height="128"
+   viewBox="0 0 128 128"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="b-monogram.svg"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.703125"
+     inkscape:cx="42.358381"
+     inkscape:cy="71.028902"
+     inkscape:window-width="1500"
+     inkscape:window-height="930"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4" />
+  <title
+     id="title1">FormuLang.NET</title>
+  <defs
+     id="defs2">
+    <linearGradient
+       id="bg"
+       x1="0"
+       y1="0"
+       x2="1"
+       y2="1">
+      <stop
+         offset="0"
+         stop-color="#9438ff"
+         id="stop1" />
+      <stop
+         offset="1"
+         stop-color="#512bd4"
+         id="stop2" />
+    </linearGradient>
+  </defs>
+  <path
+     fill="url(#bg)"
+     d="m 16,0 h 112 v 112 l -16,16 H 0 V 16 Z"
+     id="path2"
+     style="display:inline"
+     inkscape:label="Fill" />
+  <g
+     fill="#ffffff"
+     id="g4"
+     inkscape:label="Logotype">
+    <g
+       id="g2"
+       style="display:inline"
+       inkscape:label="DotNET"
+       transform="matrix(0.54098361,0,0,0.54098361,-84.475411,55.311475)">
+      <path
+         d="m 290,72 h 5 l 11,18 h -5 z"
+         id="path20" />
+      <rect
+         x="280"
+         y="85"
+         width="5"
+         height="5"
+         id="rect18" />
+      <rect
+         x="290"
+         y="72"
+         width="5"
+         height="18"
+         id="rect19" />
+      <rect
+         x="301"
+         y="72"
+         width="5"
+         height="18"
+         id="rect20" />
+      <rect
+         x="310"
+         y="72"
+         width="5"
+         height="18"
+         id="rect21" />
+      <rect
+         x="310"
+         y="72"
+         width="12"
+         height="5"
+         id="rect22" />
+      <rect
+         x="310"
+         y="78.5"
+         width="10"
+         height="5"
+         id="rect23" />
+      <rect
+         x="310"
+         y="85"
+         width="12"
+         height="5"
+         id="rect24" />
+      <rect
+         x="326"
+         y="72"
+         width="15"
+         height="5"
+         id="rect25" />
+      <rect
+         x="331"
+         y="72"
+         width="5"
+         height="18"
+         id="rect26" />
+    </g>
+    <path
+       d="M 56,72 H 92 L 82,82 H 56 Z"
+       id="path4"
+       style="display:inline"
+       inkscape:label="L" />
+    <path
+       d="M 28,24 H 100 L 88,36 H 40 V 54 H 92 L 82,64 H 40 V 92 L 28,104 Z"
+       id="path3"
+       inkscape:label="F" />
+  </g>
+</svg>
