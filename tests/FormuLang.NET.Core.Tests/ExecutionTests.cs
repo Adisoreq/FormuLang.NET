@@ -111,7 +111,7 @@ namespace FormuLang.NET.Core.Tests
         // procedures/REQUIRE.md
         [Theory]
         [InlineData("REQUIRE \"core-0.2+\"", "[SUCCESS (0)] Operation completed successfully.")]
-        [InlineData("REQUIRE([\"core-0.x\", \"core-0.2\"])", "[SUCCESS (0)] Operation completed successfully.")]
+        [InlineData("REQUIRE([\"core-0.x\", \"core-0.3\"])", "[SUCCESS (0)] Operation completed successfully.")]
         [InlineData("REQUIRE \"stock-5.2+\"", "[NOT_SUPPORTED_ERROR (11)] Standard \"stock-5.2+\" is not supported.")]
         [InlineData("REQUIRE \"core-1.0+\"", "[NOT_SUPPORTED_ERROR (11)] Standard \"core-1.0+\" is not supported.")]
         [InlineData("REQUIRE \"core\"", "[OPERATION_ERROR (3)] \"core\" is not a valid standard requirement.")]
@@ -156,8 +156,8 @@ namespace FormuLang.NET.Core.Tests
 
         // examples/environment_examples.md
         [Theory]
-        [InlineData("$standards = JOIN(STANDARDS, \", \")\nCONCAT(\"Supported standards: \", $standards)", "Supported standards: core-0.2")]
-        [InlineData("REQUIRE \"core-0.2\"\nREQUIRE \"stock-5.2+\"\n$diff = CLOSE[I] - OPEN[I]", "[NOT_SUPPORTED_ERROR (11)] Standard \"stock-5.2+\" is not supported.")]
+        [InlineData("$standards = JOIN(STANDARDS, \", \")\nCONCAT(\"Supported standards: \", $standards)", "Supported standards: core-0.3")]
+        [InlineData("REQUIRE \"core-0.3\"\nREQUIRE \"stock-5.2+\"\n$diff = CLOSE[I] - OPEN[I]", "[NOT_SUPPORTED_ERROR (11)] Standard \"stock-5.2+\" is not supported.")]
         [InlineData("$radius = 2\nMUL(PI, POW($radius, 2))", "12.566370614359172")]
         [InlineData("@array_indexing = 1\n$elements = ARRAY(10, 20, 30, 40)\n$elements[1]", "10")]
         public void EnvironmentExamples(string formula, string expected)
@@ -223,7 +223,7 @@ namespace FormuLang.NET.Core.Tests
         [Theory]
         [InlineData("$f = (x) => x * 2\nISDEL($f)", "true")]
         [InlineData("$f = (x, y) => x * y\nTEXT($f)", "(x, y) => any")]
-        [InlineData("MAP([1, 2], (a, b) => a)", "[ARGUMENT_ERROR (6)] The lambda passed to \"MAP\" must have exactly 1 parameter.")]
+        [InlineData("MAP([1, 2], (a, b, c) => a)", "[ARGUMENT_ERROR (6)] The lambda passed to \"MAP\" must have 1 or 2 parameter(s).")]
         [InlineData("MAP([1, 2], (e) => DIV(1, e - 1))", "[OPERATION_ERROR (3)] Division by zero.")]
         [InlineData("$k = 10\nMAP([1, 2], (e) => e + $k)", "[11, 12]")]
         [InlineData("MAP([[1, 2], [3]], (row) => SUM(MAP(row, (e) => e * 10)))", "[30, 30]")]

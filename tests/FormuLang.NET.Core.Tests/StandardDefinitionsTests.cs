@@ -100,8 +100,8 @@ namespace FormuLang.NET.Core.Tests
         {
             var env = Env.Create();
 
-            Assert.True(env.Supports("core-0.2"));
-            Assert.Equal("[\"core-0.2\"]", env.GetProperty("STANDARDS").GetValue().ToString());
+            Assert.True(env.Supports("core-0.3"));
+            Assert.Equal("[\"core-0.3\"]", env.GetProperty("STANDARDS").GetValue().ToString());
             Assert.Equal(Math.E, ((Value)env.GetProperty("E").GetValue()).AsNumber());
             Assert.Equal(Math.PI, ((Value)env.GetProperty("PI").GetValue()).AsNumber());
             Assert.Equal(1.618033988749894, ((Value)env.GetProperty("PHI").GetValue()).AsNumber()!.Value, tolerance: 1e-14);
@@ -127,7 +127,7 @@ namespace FormuLang.NET.Core.Tests
             env.RegisterStandard("stock-0.1");
 
             Assert.True(env.Supports("stock-0.1"));
-            Assert.Equal("[\"core-0.2\", \"stock-0.1\"]", env.GetProperty("STANDARDS").GetValue().ToString());
+            Assert.Equal("[\"core-0.3\", \"stock-0.1\"]", env.GetProperty("STANDARDS").GetValue().ToString());
         }
 
         // docs/syntax/literals.md, "Number"

@@ -34,7 +34,7 @@ $principal * (1 + $rate) ^ 10
 Each stage is defined by an interface in `FormuLang.NET.Abstractions` and implemented in `FormuLang.NET.Core`, so a host application can replace any single stage with its own implementation.
 
 > [!NOTE]
-> The standard and this library are developed in parallel. The library currently targets **Core `core-0.2`** (in progress). See [Conformance](docs/conformance.md) for what is implemented and what is not yet.
+> The standard and this library are developed in parallel. The library currently targets **Core `core-0.3`** and **Stock `stock-0.1`** (in progress). See [Conformance](docs/conformance.md) for what is implemented and what is not yet.
 
 
 ## Library modules
@@ -45,7 +45,7 @@ Module list:
 | :----- | :---------- | :----- |
 | [**FormuLang.NET.Abstractions**](src/FormuLang.NET.Abstractions) | Interfaces and enumerations shared by every module: primitives (`IValue`, `IType`, `IContainer`, `IFunction`), pipeline stages (`IValidator`, `ICleaner`, `ITokenizer`, `IParser`, `IEvaluator`), structures (`IEnvironment`, `IContext`, `IStandard`). No dependencies. | In progress |
 | [**FormuLang.NET.Core**](src/FormuLang.NET.Core) | Implementation of the **Core** standard: the execution pipeline, primitives, errors, operators, built-in functions and procedures. | In progress |
-| **FormuLang.NET.Extensions.Stock** | Implementation of the planned **Stock** extension standard: candle types, stock indicators, `BUY` / `SELL` strategies. | Planned |
+| [**FormuLang.NET.Extensions.Stock**](src/FormuLang.NET.Extensions.Stock) | Implementation of the **Stock** extension standard: the `Stock.Candle` type, the Stock, Indicator, Pattern and Strategy contexts, the indicator registry, `CANDLE` and `INDICATOR`. | In progress |
 
 Dependency tree:
 
@@ -54,9 +54,9 @@ flowchart RL
 
 A[FormuLang.NET.Abstractions]
 C[FormuLang.NET.Core]
-E[FormuLang.NET.Abstractions.*]
+ES[FormuLang.NET.Extensions.Stock]
 
-E --> C --> A
+ES --> C --> A
 
 ```
 
@@ -106,7 +106,7 @@ dotnet test FormuLang.NET.sln
 
 Current stage: **Prototyping**
 
-Every stage of the execution pipeline and every function and procedure of the Core standard (`core-0.2`) is implemented and covered by conformance tests built from the examples of the standard. The remaining differences are listed in [Conformance](docs/conformance.md).
+Every stage of the execution pipeline and every function and procedure of the Core standard (`core-0.3`) and of the Stock standard (`stock-0.1`) is implemented and covered by conformance tests built from the examples of the standard. The remaining differences are listed in [Conformance](docs/conformance.md).
 
 | Pipeline stage | Status |
 | :------------- | :----- |

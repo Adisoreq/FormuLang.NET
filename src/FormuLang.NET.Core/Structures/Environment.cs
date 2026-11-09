@@ -1,6 +1,7 @@
 ﻿using FormuLang.NET.Abstractions.Functions;
 using FormuLang.NET.Abstractions.Structures;
 using FormuLang.NET.Core.Primitives;
+using FormuLang.NET.Core.Utils;
 
 namespace FormuLang.NET.Core.Structures
 {
@@ -51,7 +52,7 @@ namespace FormuLang.NET.Core.Structures
             env.InitConstant("PI", Value.Number(Math.PI, "PI"));
             env.InitConstant("PHI", Value.Number((1 + Math.Sqrt(5)) / 2, "PHI"));
 
-            // Keyword constants (docs/syntax/literals.md: "pre-initialized environment constants")
+            // Keyword constants
             env.InitConstant("TRUE", Value.Boolean(true, "TRUE"));
             env.InitConstant("FALSE", Value.Boolean(false, "FALSE"));
             env.InitConstant("NULL", Value.Null("NULL"));
@@ -59,6 +60,13 @@ namespace FormuLang.NET.Core.Structures
             // Variables
             env.InitVariable("array_indexing", Value.Number(0, "0"));
             env.InitVariable("suppress_errors", Value.Boolean(false, "false"));
+
+            // Serialization variables
+            env.InitVariable(SerializationOptions.DecimalPlaceName, Value.Number(-1, "-1"));
+            env.InitVariable(SerializationOptions.SplitArrayName, Value.Boolean(false, "false"));
+            env.InitVariable(SerializationOptions.SplitObjectName, Value.Boolean(false, "false"));
+            env.InitVariable(SerializationOptions.IncludeObjectClassName, Value.Boolean(false, "false"));
+            env.InitVariable(SerializationOptions.MaxArrayPreviewName, Value.Number(-1, "-1"));
 
             env.RegisterStandard(FormuLang.NET.Core.Standards.CoreStandard.Instance);
 

@@ -7,7 +7,10 @@ namespace FormuLang.NET.Core.Primitives
     {
         protected readonly Dictionary<string, Container> _properties = new Dictionary<string, Container>();
 
-        public IEnumerable<string> Keys => _properties.Keys;
+        // Keys in the order in which they were defined (docs/standards/core/functions/KEYS.md)
+        private readonly List<string> _order = [];
+
+        public IEnumerable<string> Keys => _order;
 
         public IContainer GetProperty(string key) => _properties[key];
 
@@ -21,6 +24,7 @@ namespace FormuLang.NET.Core.Primitives
                 return false;
 
             _properties[key] = new Constant(key, value);
+            _order.Add(key);
             return true;
         }
 
@@ -30,6 +34,7 @@ namespace FormuLang.NET.Core.Primitives
                 return false;
 
             _properties[key] = new Variable(key, value);
+            _order.Add(key);
             return true;
         }
 
@@ -45,16 +50,32 @@ namespace FormuLang.NET.Core.Primitives
         /// Creates a constant, or replaces an existing property with a constant. Meant for the host application, e.g. to
         /// set the current iteration of a loop context; a formula can never change a constant.
         /// </summary>
-        public void SetConstant(string key, IValue value)
+        public void SetConstant(string key, IValue value) => SetContainer(new Constant(key, value));
+
+        /// <summary>
+        /// Creates or replaces a property with the given container, e.g. a <see cref="ComputedConstant"/>. An existing key
+        /// keeps its position in <see cref="Keys"/>.
+        /// </summary>
+        public void SetContainer(Container container)
         {
-            _properties[key] = new Constant(key, value);
+            if (!_properties.ContainsKey(container.Name))
+                _order.Add(container.Name);
+
+            _properties[container.Name] = container;
         }
 
         /// <summary>
         /// Removes a property (variable or constant).
         /// </summary>
         /// <returns>False if the key does not exist.</returns>
-        public bool RemoveProperty(string key) => _properties.Remove(key);
+        public bool RemoveProperty(string key)
+        {
+            if (!_properties.Remove(key))
+                return false;
+
+            _order.Remove(key);
+            return true;
+        }
 
         public override string ToString() => StringConverter.ObjectToString(this);
     }

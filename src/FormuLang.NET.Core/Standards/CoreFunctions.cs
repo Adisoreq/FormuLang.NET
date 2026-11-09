@@ -1,5 +1,6 @@
-using FormuLang.NET.Abstractions.Functions;
+﻿using FormuLang.NET.Abstractions.Functions;
 using FormuLang.NET.Abstractions.Primitives;
+using FormuLang.NET.Abstractions.Structures;
 using FormuLang.NET.Core.Functions;
 using FormuLang.NET.Core.Primitives;
 using FormuLang.NET.Core.Utils;
@@ -51,6 +52,8 @@ namespace FormuLang.NET.Core.Standards
             Fn("CLAMP", Overload((a, _) => Num(a[1]) > Num(a[2])
                 ? OperationError("\"min\" is greater than \"max\".")
                 : N(Math.Clamp(Num(a[0]), Num(a[1]), Num(a[2]))), NumberArg("value"), NumberArg("min"), NumberArg("max"))),
+            Fn("SIGN", Overload((a, _) => N(Math.Sign(Num(a[0]))), NumberArg("num"))),
+            Fn("TRUNC", Overload((a, _) => Round(Num(a[0]), Num(a[1]), Math.Truncate, Math.Truncate), NumberArg("number"), NumberArg("precision"))),
 
             // 2. Logic and comparison
             Fn("AND", Overload((a, _) => B(Bool(a[0]) && Bool(a[1])), BooleanArg("a"), BooleanArg("b"))),
@@ -73,8 +76,25 @@ namespace FormuLang.NET.Core.Standards
             Fn("TRIM", Overload((a, _) => T(Txt(a[0]).Trim(' ', '\t', '\n', '\r')), TextArg("text"))),
             Fn("UPPERCASE", Overload((a, _) => T(Txt(a[0]).ToUpperInvariant()), TextArg("text"))),
             Fn("LOWERCASE", Overload((a, _) => T(Txt(a[0]).ToLowerInvariant()), TextArg("text"))),
-            Fn("JOIN", Overload((a, _) => Join(Arr(a[0]), a.Count > 1 ? Txt(a[1]) : ""), ArrayArg("array"), TextArg("separator", optional: true))),
+            Fn("JOIN", Overload((a, c) => Join(Arr(a[0]), a.Count > 1 ? Txt(a[1]) : "", c), ArrayArg("array"), TextArg("separator", optional: true))),
             Fn("SPLIT", Overload((a, _) => Split(Txt(a[0]), Txt(a[1])), TextArg("text"), TextArg("separator"))),
+            Fn("SUBSTR",
+                Overload((a, c) => Substring(Txt(a[0]), Num(a[1]), null, c), TextArg("text"), NumberArg("start")),
+                Overload((a, c) => Substring(Txt(a[0]), Num(a[1]), Num(a[2]), c), TextArg("text"), NumberArg("start"), NumberArg("length"))),
+            Fn("FIND",
+                Overload((a, c) => FindText(Txt(a[0]), Txt(a[1]), c), TextArg("text"), TextArg("part")),
+                Overload((a, c) => FindElement(Arr(a[0]), a[1], c), ArrayArg("array"), AnyArg("value"))),
+            Fn("CONTAINS",
+                Overload((a, _) => B(Txt(a[0]).Contains(Txt(a[1]), StringComparison.Ordinal)), TextArg("text"), TextArg("part")),
+                Overload((a, _) => B(Arr(a[0]).Any(e => ValuesEqual(e, a[1]))), ArrayArg("array"), AnyArg("value"))),
+            Fn("STARTS", Overload((a, _) => B(Txt(a[0]).StartsWith(Txt(a[1]), StringComparison.Ordinal)), TextArg("text"), TextArg("part"))),
+            Fn("ENDS", Overload((a, _) => B(Txt(a[0]).EndsWith(Txt(a[1]), StringComparison.Ordinal)), TextArg("text"), TextArg("part"))),
+            Fn("REPLACE", Overload((a, _) => Txt(a[1]).Length == 0
+                ? OperationError("\"search\" is an empty text.")
+                : T(Txt(a[0]).Replace(Txt(a[1]), Txt(a[2]), StringComparison.Ordinal)), TextArg("text"), TextArg("search"), TextArg("replacement"))),
+            Fn("REVERSE",
+                Overload((a, _) => A(Arr(a[0]).Reverse()), ArrayArg("array")),
+                Overload((a, _) => T(new string(Txt(a[0]).Reverse().ToArray())), TextArg("text"))),
 
             // 5. Arrays and collections
             Fn("ARRAY", Overload((a, _) => A(a), ArgumentTemplate.Any("elements", optional: true, multiple: true))),
@@ -87,13 +107,30 @@ namespace FormuLang.NET.Core.Standards
             Fn("AVG", Overload((a, _) => Arr(a[0]).Length == 0
                 ? OperationError("The array is empty.")
                 : N(Arr(a[0]).Average(Num)), NumberArrayArg("array"))),
-            Fn("LEN", Overload((a, _) => N(Arr(a[0]).Length), ArrayArg("array"))),
+            Fn("LEN",
+                Overload((a, _) => N(Arr(a[0]).Length), ArrayArg("array")),
+                Overload((a, _) => N(Txt(a[0]).Length), TextArg("text"))),
             Extreme("MAX", (x, y) => x >= y),
             Extreme("MIN", (x, y) => x <= y),
             Fn("RANGE", Overload((a, c) => Range(Arr(a[0]), Num(a[1]), Num(a[2]), c),
                 ArrayArg("array"), NumberArg("first_index"), NumberArg("last_index"))),
+            Fn("SEQ",
+                Overload((a, c) => Seq(Num(a[0]), 1, ArrayIndexing(c)), NumberArg("n")),
+                Overload((a, c) => Seq(Num(a[0]), Num(a[1]), ArrayIndexing(c)), NumberArg("n"), NumberArg("step")),
+                Overload((a, _) => Seq(Num(a[0]), Num(a[1]), Num(a[2])), NumberArg("n"), NumberArg("step"), NumberArg("start")),
+                Overload((a, c) => SeqGenerator(Num(a[0]), Del(a[1]), c), NumberArg("n"), DelegateArg("generator"))),
             Fn("MAP", Overload((a, c) => Map(Arr(a[0]), Del(a[1]), c), ArrayArg("array"), DelegateArg("lambda"))),
             Fn("FILTER", Overload((a, c) => Filter(Arr(a[0]), Del(a[1]), c), ArrayArg("array"), DelegateArg("lambda"))),
+            Fn("REDUCE", Overload((a, c) => Reduce(Arr(a[0]), Del(a[1]), a[2], c), ArrayArg("array"), DelegateArg("lambda"), AnyArg("initial"))),
+            Fn("ANY", Overload((a, c) => Quantify("ANY", Arr(a[0]), Del(a[1]), stopAt: true, c), ArrayArg("array"), DelegateArg("lambda"))),
+            Fn("ALL", Overload((a, c) => Quantify("ALL", Arr(a[0]), Del(a[1]), stopAt: false, c), ArrayArg("array"), DelegateArg("lambda"))),
+            Fn("HAS",
+                Overload((a, _) => B(Obj(a[0]).HasKey(Txt(a[1]))), ObjectArg("object"), TextArg("key")),
+                Overload((a, c) => B(TryResolveIndex(Num(a[1]), Arr(a[0]).Length, c, out _, out _)), ArrayArg("array"), NumberArg("index"))),
+            Fn("SORT",
+                Overload((a, _) => A(Arr(a[0]).OrderBy(Num)), NumberArrayArg("numbers")),
+                Overload((a, _) => A(Arr(a[0]).OrderBy(Txt, StringComparer.Ordinal)), ArgumentTemplate.ArrayOf("texts", Types.Text)),
+                Overload((a, c) => SortBy(Arr(a[0]), Del(a[1]), c), ArrayArg("elements"), DelegateArg("handler"))),
 
             // 6. Types
             IsType("ISNULL", Types.NullName),
@@ -119,8 +156,28 @@ namespace FormuLang.NET.Core.Standards
                 Overload((a, _) => a[0], NumberArg("value")),
                 Overload((a, _) => N(ParseNumber(Txt(a[0]))), TextArg("value"))),
             Fn("TEXT", new[] { Types.Null, Types.Boolean, Types.Number, Types.Text, Types.Array, Types.Object, Types.Delegate }
-                .Select(type => Overload((a, _) => T(StringConverter.ValueToString(a[0])), ArgumentTemplate.Of("value", type)))
+                .Select(type => Overload((a, c) => T(Serialize(a[0], c)), ArgumentTemplate.Of("value", type)))
                 .ToArray()),
+
+            // 8. Trigonometric
+            Fn("SIN", Overload((a, _) => N(Math.Sin(Num(a[0]))), NumberArg("angle"))),
+            Fn("COS", Overload((a, _) => N(Math.Cos(Num(a[0]))), NumberArg("angle"))),
+            Fn("TAN", Overload((a, _) => N(Math.Tan(Num(a[0]))), NumberArg("angle"))),
+            Fn("ASIN", Overload((a, _) => Math.Abs(Num(a[0])) > 1
+                ? OperationError("\"value\" is outside of the range from -1 to 1.")
+                : N(Math.Asin(Num(a[0]))), NumberArg("value"))),
+            Fn("ACOS", Overload((a, _) => Math.Abs(Num(a[0])) > 1
+                ? OperationError("\"value\" is outside of the range from -1 to 1.")
+                : N(Math.Acos(Num(a[0]))), NumberArg("value"))),
+            Fn("ATAN", Overload((a, _) => N(Math.Atan(Num(a[0]))), NumberArg("value"))),
+            Fn("ATAN2", Overload((a, _) => Num(a[0]) == 0 && Num(a[1]) == 0
+                ? N(0)
+                : N(Math.Atan2(Num(a[0]), Num(a[1]))), NumberArg("y"), NumberArg("x"))),
+            Fn("DEG", Overload((a, _) => N(Num(a[0]) * 180 / Math.PI), NumberArg("radians"))),
+            Fn("RAD", Overload((a, _) => N(Num(a[0]) * Math.PI / 180), NumberArg("degrees"))),
+
+            // 9. Objects
+            Fn("KEYS", Overload((a, _) => A(Obj(a[0]).Keys.Select(T)), ObjectArg("object"))),
 
             // Target of the object literal translation: { k1: a, "k2": b } is OBJECT("k1",a,"k2",b)
             Fn("OBJECT", Overload((a, _) => CreateObject(a), ArgumentTemplate.Any("entries", optional: true, multiple: true))),
@@ -262,12 +319,49 @@ namespace FormuLang.NET.Core.Standards
 
         // Text
 
-        private static IValue Join(IValue[] elements, string separator)
+        /// <summary>
+        /// Serialization with the parameters of the current execution (TEXT, JOIN).
+        /// </summary>
+        private static string Serialize(IValue value, IContext context)
+            => StringConverter.ValueToString(value, SerializationOptions.FromContext(context));
+
+        private static IValue Join(IValue[] elements, string separator, IContext context)
         {
             if (elements.FirstOrDefault(IsError) is IValue error)
                 return error;
 
-            return T(string.Join(separator, elements.Select(StringConverter.ValueToString)));
+            var options = SerializationOptions.FromContext(context);
+            return T(string.Join(separator, elements.Select(e => StringConverter.ValueToString(e, options))));
+        }
+
+        private static IValue Substring(string text, double start, double? length, IContext context)
+        {
+            double from = start - ArrayIndexing(context);
+
+            if (!IsWhole(from) || from < 0 || from > text.Length)
+                return InvalidIndexError($"Position {StringConverter.NumberToString(start)} is outside of the text.");
+
+            double count = length ?? text.Length - from;
+
+            if (!IsWhole(count) || count < 0)
+                return OperationError("\"length\" is not a whole number or is negative.");
+
+            if (from + count > text.Length)
+                return InvalidIndexError("The part ends after the last character of the text.");
+
+            return T(text.Substring((int)from, (int)count));
+        }
+
+        private static IValue FindText(string text, string part, IContext context)
+        {
+            int index = text.IndexOf(part, StringComparison.Ordinal);
+            return index < 0 ? Value.Null() : N(index + ArrayIndexing(context));
+        }
+
+        private static IValue FindElement(IValue[] array, IValue value, IContext context)
+        {
+            int index = Array.FindIndex(array, e => ValuesEqual(e, value));
+            return index < 0 ? Value.Null() : N(index + ArrayIndexing(context));
         }
 
         private static IValue Split(string text, string separator)
@@ -306,7 +400,7 @@ namespace FormuLang.NET.Core.Standards
             return obj.GetProperty(key).GetValue();
         }
 
-        private static IValue Range(IValue[] array, double first, double last, Abstractions.Structures.IContext context)
+        private static IValue Range(IValue[] array, double first, double last, IContext context)
         {
             if (!TryResolveIndex(first, array.Length, context, out int from, out var error) ||
                 !TryResolveIndex(last, array.Length, context, out int to, out error))
@@ -318,16 +412,21 @@ namespace FormuLang.NET.Core.Standards
             return A(array[from..(to + 1)]);
         }
 
-        private static IValue Map(IValue[] array, IFunction lambda, Abstractions.Structures.IContext context)
+        private static IValue Map(IValue[] array, IFunction lambda, IContext context)
         {
-            if (CheckHandler(lambda, "MAP") is IValue error)
+            if (CheckHandler(lambda, "MAP", 1, 2) is IValue error)
                 return error;
 
+            bool withIndex = ParameterCount(lambda) == 2;
+            double indexing = ArrayIndexing(context);
             var results = new List<IValue>(array.Length);
 
-            foreach (IValue element in array)
+            for (int i = 0; i < array.Length; i++)
             {
-                IValue result = Call(lambda, element, context);
+                IValue result = withIndex
+                    ? Call(lambda, context, array[i], N(i + indexing))
+                    : Call(lambda, array[i], context);
+
                 if (IsError(result))
                     return result;
 
@@ -337,7 +436,128 @@ namespace FormuLang.NET.Core.Standards
             return A(results);
         }
 
-        private static IValue Filter(IValue[] array, IFunction lambda, Abstractions.Structures.IContext context)
+        private static IValue Seq(double n, double step, double start)
+        {
+            if (!IsWhole(n) || n < 0)
+                return OperationError("\"n\" is not a whole number or is negative.");
+
+            if (n > Array.MaxLength)
+                return OperationError("\"n\" is too large.");
+
+            var results = new IValue[(int)n];
+
+            for (int k = 0; k < results.Length; k++)
+            {
+                IValue element = N(start + k * step);
+                if (IsError(element))
+                    return element;
+
+                results[k] = element;
+            }
+
+            return A(results);
+        }
+
+        private static IValue SeqGenerator(double n, IFunction generator, IContext context)
+        {
+            if (CheckHandler(generator, "SEQ") is IValue error)
+                return error;
+
+            IValue indices = Seq(n, 1, ArrayIndexing(context));
+            if (IsError(indices))
+                return indices;
+
+            var results = new List<IValue>(Arr(indices).Length);
+
+            foreach (IValue index in Arr(indices))
+            {
+                IValue result = Call(generator, index, context);
+                if (IsError(result))
+                    return result;
+
+                results.Add(result);
+            }
+
+            return A(results);
+        }
+
+        private static IValue Reduce(IValue[] array, IFunction lambda, IValue initial, IContext context)
+        {
+            if (CheckHandler(lambda, "REDUCE", 2, 3) is IValue error)
+                return error;
+
+            bool withIndex = ParameterCount(lambda) == 3;
+            double indexing = ArrayIndexing(context);
+            IValue accumulated = initial;
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                accumulated = withIndex
+                    ? Call(lambda, context, accumulated, array[i], N(i + indexing))
+                    : Call(lambda, context, accumulated, array[i]);
+
+                if (IsError(accumulated))
+                    return accumulated;
+            }
+
+            return accumulated;
+        }
+
+        /// <summary>
+        /// ANY (stops at the first <c>true</c>) and ALL (stops at the first <c>false</c>).
+        /// </summary>
+        private static IValue Quantify(string name, IValue[] array, IFunction lambda, bool stopAt, IContext context)
+        {
+            if (CheckHandler(lambda, name) is IValue error)
+                return error;
+
+            foreach (IValue element in array)
+            {
+                IValue result = Call(lambda, element, context);
+                if (IsError(result))
+                    return result;
+
+                if (result.Raw is not bool value || result.Type.Base != Types.BooleanName)
+                    return OperationError($"The lambda passed to \"{name}\" must return a Boolean.");
+
+                if (value == stopAt)
+                    return B(stopAt);
+            }
+
+            return B(!stopAt);
+        }
+
+        private static IValue SortBy(IValue[] elements, IFunction handler, IContext context)
+        {
+            if (CheckHandler(handler, "SORT") is IValue error)
+                return error;
+
+            var keys = new IValue[elements.Length];
+
+            for (int i = 0; i < elements.Length; i++)
+            {
+                IValue key = Call(handler, elements[i], context);
+                if (IsError(key))
+                    return key;
+
+                if (key.Type.Base != Types.NumberName && key.Type.Base != Types.TextName)
+                    return OperationError("The handler passed to \"SORT\" must return a Number or a Text.");
+
+                if (i > 0 && key.Type.Base != keys[0].Type.Base)
+                    return OperationError("The handler passed to \"SORT\" must return values of the same type.");
+
+                keys[i] = key;
+            }
+
+            IEnumerable<int> order = Enumerable.Range(0, elements.Length);
+            order = keys.Length > 0 && keys[0].Type.Base == Types.TextName
+                ? order.OrderBy(i => Txt(keys[i]), StringComparer.Ordinal)
+                : order.OrderBy(i => Num(keys[i]));
+
+            return A(order.Select(i => elements[i]));
+        }
+
+        private static IValue Filter(IValue[] array, IFunction lambda, IContext context)
         {
             if (CheckHandler(lambda, "FILTER") is IValue error)
                 return error;

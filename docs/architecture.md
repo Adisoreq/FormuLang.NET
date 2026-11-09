@@ -78,4 +78,4 @@ The host application chooses the context a formula runs in, as in step 1 of [pre
 - **Errors are values.** Formula errors are returned as `IError` / `Value.Error(...)`, never thrown. Exceptions are reserved for programming errors of the host application (e.g. registering a function twice).
 - **Abstractions first.** A new concept of the standard gets an interface in `Abstractions` before it gets an implementation in `Core`.
 - **One standard, one module.** Code that belongs to an extension standard does not go into `Core`.
-- **Standard identifiers come from the standard.** Error codes and names, operator spellings and binding powers, function signatures and standard identifiers (`core-0.2`) are copied from the standard documents; see [Development](development.md#keeping-the-library-in-sync-with-the-standard).
+- **Standard identifiers come from the standard.** Error codes and names, operator spellings and binding powers, function signatures and standard identifiers (`core-0.3`) are copied from the standard documents; see [Development](development.md#keeping-the-library-in-sync-with-the-standard).

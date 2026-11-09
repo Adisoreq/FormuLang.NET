@@ -2,7 +2,7 @@
 
 namespace FormuLang.NET.Core.Structures
 {
-    internal class AbstractTreeNode<T> : IAbstractTreeNode<T>
+    public class AbstractTreeNode<T> : IAbstractTreeNode<T>
     {
         private readonly List<AbstractTreeNode<T>> _children = [];
 

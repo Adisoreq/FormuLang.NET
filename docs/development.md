@@ -20,7 +20,7 @@ Values defined by the standard are copied from it, never chosen in the library:
 
 - error codes and names ([Core errors](https://github.com/Adisoreq/FormuLang/blob/main/docs/standards/core/errors/README.md)),
 - operator spellings, binding powers and associativity ([Operator parsing](https://github.com/Adisoreq/FormuLang/blob/main/docs/semantics/operator-parsing.md#binding-power)),
-- standard identifiers (`core-0.2`), environment constants and variables ([Core](https://github.com/Adisoreq/FormuLang/blob/main/docs/standards/core/README.md)).
+- standard identifiers (`core-0.3`), environment constants and variables ([Core](https://github.com/Adisoreq/FormuLang/blob/main/docs/standards/core/README.md)).
 
 If the implementation needs something the standard does not define (for example a new error), propose it in the standard first, then implement it.
 

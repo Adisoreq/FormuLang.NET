@@ -1,4 +1,4 @@
-using FormuLang.NET.Abstractions.Primitives;
+﻿using FormuLang.NET.Abstractions.Primitives;
 using FormuLang.NET.Abstractions.Structures;
 
 namespace FormuLang.NET.Core.Structures
@@ -8,9 +8,9 @@ namespace FormuLang.NET.Core.Structures
     /// the copies of the environment (@) variables.
     /// </summary>
     /// <remarks>
-    /// The host application chooses the type of the context (docs/semantics/pre-execution.md, step 1). This class is the
-    /// basic Core context, which has no constants of its own. A context type that provides its own data (e.g. the
-    /// candles of a stock indicator) derives from it and loads that data in <see cref="LoadContextData"/>.
+    /// The host application chooses the context type (docs/core/context.md, "Context types"). This class is the Core
+    /// <b>Default Context</b>, which has no constants of its own. A context type that provides its own data derives from
+    /// it and loads that data in <see cref="LoadContextData"/>, e.g. <see cref="IterationContext"/>.
     /// </remarks>
     public class Context : Primitives.Object, IContext
     {
@@ -21,6 +21,9 @@ namespace FormuLang.NET.Core.Structures
 
         public IObject EnvironmentVariables => _environmentVariables;
 
+        /// <summary>
+        /// Context kind: disposable or persistent (docs/core/context.md, "Context kinds").
+        /// </summary>
         public ContextType ContextType { get; }
 
         protected Context(IEnvironment environment, ContextType contextType)
@@ -32,7 +35,7 @@ namespace FormuLang.NET.Core.Structures
         /// <summary>
         /// Creates a context and runs the pre-execution.
         /// </summary>
-        /// <param name="contextType">Disposable for a single execution; persistent to keep the variables between executions.</param>
+        /// <param name="contextType">Context kind: disposable for a single execution; persistent to keep the variables between executions.</param>
         public static Context Create(IEnvironment environment, ContextType contextType = ContextType.Disposable)
         {
             var context = new Context(environment, contextType);
@@ -68,6 +71,19 @@ namespace FormuLang.NET.Core.Structures
         /// The basic Core context has no data of its own.
         /// </summary>
         protected virtual void LoadContextData() { }
+
+        /// <summary>
+        /// Removes every context variable and every copy of an environment variable; context constants are kept.
+        /// The next <see cref="PreExecute"/> copies the environment variables again.
+        /// </summary>
+        protected void ClearVariables()
+        {
+            foreach (string key in Keys.Where(k => GetProperty(k).ContainerType == ContainerType.Variable).ToArray())
+                RemoveProperty(key);
+
+            foreach (string key in _environmentVariables.Keys.ToArray())
+                _environmentVariables.RemoveProperty(key);
+        }
 
         /// <summary>
         /// Reads a copied environment variable, e.g. <c>array_indexing</c>.

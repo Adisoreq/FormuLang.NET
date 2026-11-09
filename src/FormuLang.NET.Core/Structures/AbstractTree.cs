@@ -2,7 +2,7 @@
 
 namespace FormuLang.NET.Core.Structures
 {
-    internal class AbstractTree<T> : IAbstractTree<T>
+    public class AbstractTree<T> : IAbstractTree<T>
     {
         private readonly Dictionary<string, AbstractTreeNode<T>> _nodes = new();
 

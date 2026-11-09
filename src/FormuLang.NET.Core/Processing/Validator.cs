@@ -1,4 +1,4 @@
-using FormuLang.NET.Abstractions.Primitives;
+﻿using FormuLang.NET.Abstractions.Primitives;
 using FormuLang.NET.Abstractions.Processing;
 using FormuLang.NET.Abstractions.Structures;
 using FormuLang.NET.Core.Primitives;
@@ -47,14 +47,47 @@ namespace FormuLang.NET.Core.Processing
                     errors.Add(MissingConstant(name, Types.NumberName));
             }
 
-            IValue? indexing = Read(environment, "array_indexing", ContainerType.Variable);
-            if (indexing?.Type.Base != Types.NumberName)
-                errors.Add(MissingVariable("array_indexing", Types.NumberName));
-            else if (indexing.Raw is double d && Math.Floor(d) != d)
-                errors.Add(Errors.EnvironmentError("Environment variable \"array_indexing\" must be a whole number."));
+            if (Read(environment, "NULL", ContainerType.Constant)?.Type.Base != Types.NullName)
+                errors.Add(MissingConstant("NULL", Types.NullName));
 
-            if (Read(environment, "suppress_errors", ContainerType.Variable)?.Type.Base != Types.BooleanName)
-                errors.Add(MissingVariable("suppress_errors", Types.BooleanName));
+            CheckBooleanConstant(environment, "TRUE", true, errors);
+            CheckBooleanConstant(environment, "FALSE", false, errors);
+
+            CheckWholeNumberVariable(environment, "array_indexing", errors);
+            CheckVariable(environment, "suppress_errors", Types.BooleanName, errors);
+
+            // Serialization variables
+            CheckWholeNumberVariable(environment, SerializationOptions.DecimalPlaceName, errors);
+            CheckVariable(environment, SerializationOptions.SplitArrayName, Types.BooleanName, errors);
+            CheckVariable(environment, SerializationOptions.SplitObjectName, Types.BooleanName, errors);
+            CheckVariable(environment, SerializationOptions.IncludeObjectClassName, Types.BooleanName, errors);
+            CheckWholeNumberVariable(environment, SerializationOptions.MaxArrayPreviewName, errors);
+        }
+
+        private static void CheckBooleanConstant(IEnvironment environment, string name, bool expected, List<IError> errors)
+        {
+            IValue? value = Read(environment, name, ContainerType.Constant);
+
+            if (value?.Type.Base != Types.BooleanName)
+                errors.Add(MissingConstant(name, Types.BooleanName));
+            else if (value.Raw is not bool actual || actual != expected)
+                errors.Add(Errors.EnvironmentError($"Environment constant \"{name}\" must be {(expected ? "true" : "false")}."));
+        }
+
+        private static void CheckVariable(IEnvironment environment, string name, string type, List<IError> errors)
+        {
+            if (Read(environment, name, ContainerType.Variable)?.Type.Base != type)
+                errors.Add(MissingVariable(name, type));
+        }
+
+        private static void CheckWholeNumberVariable(IEnvironment environment, string name, List<IError> errors)
+        {
+            IValue? value = Read(environment, name, ContainerType.Variable);
+
+            if (value?.Type.Base != Types.NumberName)
+                errors.Add(MissingVariable(name, Types.NumberName));
+            else if (value.Raw is double d && Math.Floor(d) != d)
+                errors.Add(Errors.EnvironmentError($"Environment variable \"{name}\" must be a whole number."));
         }
 
         private static IValue? Read(IEnvironment environment, string name, ContainerType kind)

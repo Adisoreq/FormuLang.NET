@@ -1,4 +1,4 @@
-using FormuLang.NET.Abstractions.Functions;
+﻿using FormuLang.NET.Abstractions.Functions;
 using FormuLang.NET.Abstractions.Primitives;
 using FormuLang.NET.Abstractions.Structures;
 using FormuLang.NET.Core.Functions;
@@ -77,18 +77,33 @@ namespace FormuLang.NET.Core.Standards
         // Delegates
 
         /// <summary>
-        /// A handler of MAP, FILTER, MAX and MIN must accept exactly one argument.
+        /// A lambda passed as a handler must have one of the allowed numbers of parameters (exactly 1 by default).
+        /// A named function is not checked: its overloads decide.
         /// </summary>
-        public static IValue? CheckHandler(IFunction handler, string functionName)
+        public static IValue? CheckHandler(IFunction handler, string functionName, params int[] allowed)
         {
-            if (handler is ILambda lambda && lambda.Parameters.Count != 1)
-                return ArgumentError($"The lambda passed to \"{functionName}\" must have exactly 1 parameter.");
+            if (allowed.Length == 0)
+                allowed = [1];
+
+            if (handler is ILambda lambda && !allowed.Contains(lambda.Parameters.Count))
+            {
+                string counts = allowed.Length == 1 ? $"exactly {allowed[0]}" : string.Join(" or ", allowed);
+                return ArgumentError($"The lambda passed to \"{functionName}\" must have {counts} parameter(s).");
+            }
 
             return null;
         }
 
+        /// <summary>
+        /// Number of parameters of a lambda, or <c>null</c> for a named function.
+        /// </summary>
+        public static int? ParameterCount(IFunction function) => function is ILambda lambda ? lambda.Parameters.Count : null;
+
         public static IValue Call(IFunction function, IValue argument, IContext context)
             => function.Invoke([argument], context);
+
+        public static IValue Call(IFunction function, IContext context, params IValue[] arguments)
+            => function.Invoke(arguments, context);
 
         // Environment
 

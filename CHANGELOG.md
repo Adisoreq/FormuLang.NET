@@ -10,9 +10,22 @@ All notable changes of **FormuLang.NET**. The format is based on [Keep a Changel
 
 ## [Unreleased]
 
-Supported standards: `core-0.2` (see [Conformance](docs/conformance.md)).
+Supported standards: `core-0.3`, `stock-0.1` (see [Conformance](docs/conformance.md)).
 
 ### Added
+
+- Core `core-0.3` functions: `SIGN`, `TRUNC`, `SUBSTR`, `FIND`, `CONTAINS`, `STARTS`, `ENDS`, `REPLACE`, `REVERSE`, `LEN(text)`, `SEQ`, `REDUCE`, `ANY`, `ALL`, `SORT`, `HAS`, `KEYS` and the trigonometric functions `SIN`, `COS`, `TAN`, `ASIN`, `ACOS`, `ATAN`, `ATAN2`, `DEG`, `RAD`. `MAP` accepts a lambda with an index, `(e, i) => ...`.
+- Serialization variables `decimal_place`, `split_array`, `split_object`, `include_object_class`, `max_array_preview` in the environment; `SerializationOptions` and `StringConverter.ValueToString(value, options)`. `TEXT`, `JOIN` and `ExecutionResult.ToString()` use the variables of the execution.
+- Validation of the constants `NULL`, `TRUE`, `FALSE` and of the serialization variables.
+- `IterationContext` (Core Iteration Context with `I`, `N`, `PREV`) and `Executor.ExecuteIterations`, which parses the formula once and evaluates it for every iteration. `ComputedConstant` for constants computed when they are read.
+- `Object.Keys` keeps the order in which the keys were defined; `Object.SetContainer`.
+- `AbstractTree` and `AbstractTreeNode` are public, so extension standards can define their type trees.
+- `FormuLang.NET.Extensions.Stock` (`stock-0.1`): `Candle` / `Stock.Candle`, `CANDLE`, `INDICATOR` with an `IndicatorRegistry`, `StockContext`, `IndicatorContext`, `PatternContext`, `StrategyContext`, `StockExecutor` and `Environment.RegisterStock()`. Test project `FormuLang.NET.Extensions.Stock.Tests`.
+
+### Changed
+
+- The Core identifier is `core-0.3` (was `core-0.2`).
+
 
 - Complete execution pipeline: `Validator` (all problems at once), `Parser` (Pratt parser with operator translation, parsing queues and primitive map), `Evaluator` (variable reading rules, sequence results, `suppress_errors`, lambdas), and `Executor`, which runs every stage and returns an `ExecutionResult`.
 - `Context` with pre-execution (copies of environment variables), disposable and persistent contexts.
