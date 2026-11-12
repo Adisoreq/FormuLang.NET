@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./raw/images/icons/monogram.svg" height="50" alt="FormuLang monogram">
+<img src="./raw/images/icons/monogram.svg" height="50" alt="FormuLang.NET monogram">
 
 # Changelog
 
